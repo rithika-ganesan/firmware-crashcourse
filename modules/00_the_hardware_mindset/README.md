@@ -19,11 +19,11 @@ until you configure it. The building blocks, in the vocabulary of the Xilinx
 
 | Block | Xilinx name | What it is | Roughly how many (mid-range Artix-7) |
 |-------|-------------|------------|--------------------------------------|
-| Lookup table | **LUT6** | A 64-bit truth table: 6 inputs in, 1 bit out. Can *be* any 6-input logic function — AND, XOR, a majority vote, anything | ~100,000 |
+| Lookup table | **LUT6** | A 64-bit truth table: 6 inputs in, 1 bit out. Can *be* any 6-input logic function — AND, XOR, a majority vote, anything<br>6 inputs = 64 bits | ~100,000 |
 | Flip-flop | FF (paired with each LUT) | A 1-bit memory cell that captures its input on a clock edge | ~200,000 |
 | Logic block | **CLB** | The tile that packages LUTs and flip-flops together (8 LUTs + 16 FFs per CLB in 7-series) | ~15,000 |
 | Block RAM | **BRAM36** | A 36-kilobit dual-port memory block — your waveform buffers and FIFOs live here | ~300 |
-| DSP slice | **DSP48** | A hardened 25×18 multiplier with a 48-bit accumulator — filters, energy sums, pedestal subtraction | ~200–700 |
+| DSP slice | **DSP48** | A hardened 25×18 multiplier with a 48-bit accumulator — filters, energy sums, pedestal subtraction<br>Hardened means it's non-reconfigurable/hardwired. Multiplies 25 signed bits by 18 signed bits. Accumulator adds/subtracts values. | ~200–700 |
 | Routing | interconnect | A programmable mesh of wires and switches occupying most of the die area | — |
 
 A LUT deserves a second look, because it is the atom of everything you will
