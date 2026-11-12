@@ -39,7 +39,7 @@ begin
   begin
     -- Case 1: no pulses -> no trigger.
     pmt_a <= '0';  pmt_b <= '0';
-    wait for 10 ns;   -- let the signals propagate (only legal in simulation!)
+    wait for 5 ns;   -- let the signals propagate (only legal in simulation!)
     assert trigger = '0'
       report "FAIL: trigger fired with no input pulses" severity failure;
 
