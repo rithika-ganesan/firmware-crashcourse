@@ -170,6 +170,9 @@ Select `tb_coincidence` in the tree, drag `pmt_a`, `pmt_b`, and `trigger`
 into the wave pane. You'll see `trigger` go high only in the final 10 ns,
 when both PMT inputs are high. That's your muon.
 
+<img width="1530" height="274" alt="image" src="https://github.com/user-attachments/assets/f2f8c95c-5ed6-4ba1-ad94-eb04c646d558" />
+
+
 ## Design-choice notes
 
 Choices made in this tiny design that you'll see justified throughout the
