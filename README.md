@@ -74,6 +74,13 @@ sudo apt-get install ghdl gtkwave
 brew install ghdl gtkwave
 ```
 
+To run in Docker (ghdl on homebrew can be automatically disabled by macOS Gatekeeper if there are conflicts with the existing macOS LLVM):
+
+```
+chmod +x ghdl-shell # makes this file executable
+./ghdl-shell        # automatically builds the image if it does not exist and runs it, with the working directory mounted to /work
+``` 
+
 Then prove the toolchain works by running the first testbench:
 
 ```bash
