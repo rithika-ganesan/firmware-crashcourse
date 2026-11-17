@@ -2,14 +2,14 @@
 
 **Time: ~30 minutes** · Prerequisite: [Module 02](../02_combinational_logic/)
 
-Everything you've built so far is an instantaneous function: the outputs track
+So far, everything that has been built is an instantaneous function: the outputs track
 inputs, and nothing is remembered. This module adds the missing ingredient, 
 **state**. State allows for the three ideas that define real firmware: the
 **clock**, the **flip-flop**, and the **synchronous design discipline** that
-makes million-gate designs manageable. Every module after this one will build
+makes million-gate designs manageable. Every module from here on will utilize
 clocked logic.
 
-You'll build two designs straight out of a DAQ crate:
+In this module, you'll build two designs straight out of a DAQ crate:
 
 * `src/pulse_stretcher.vhd` — stretches a 1-cycle discriminated PMT pulse to
   a programmable coincidence window (the design Module 01 promised you);
@@ -93,8 +93,8 @@ Every piece is load-bearing:
 * **`rising_edge(clk)`** is a function from `std_logic_1164` that is true
   only at a `'0'`→`'1'` transition. Guarding everything with it says: these
   assignments happen at the edge *and at no other time*.
-* **What about all the other times?** Nothing is assigned — and in VHDL, a
-  signal that isn't assigned **holds its value**. That implicit hold is the
+* **What about all the other times?** Nothing is assigned — and **in VHDL, a
+  signal that isn't assigned holds its value**. That implicit hold is the
   memory. This is precisely how a synthesizer recognizes the template:
   "value only changes on a clock edge, otherwise holds" *is the definition
   of a flip-flop*, so every signal assigned inside the `rising_edge` block
