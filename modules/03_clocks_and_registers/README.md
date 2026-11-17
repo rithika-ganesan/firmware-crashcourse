@@ -2,12 +2,12 @@
 
 **Time: ~30 minutes** · Prerequisite: [Module 02](../02_combinational_logic/)
 
-Everything you've built so far is an instantaneous function: outputs track
-inputs, nothing is remembered. This module adds the missing ingredient —
-**state** — and with it the three ideas that define real firmware: the
+Everything you've built so far is an instantaneous function: the outputs track
+inputs, and nothing is remembered. This module adds the missing ingredient, 
+**state**. State allows for the three ideas that define real firmware: the
 **clock**, the **flip-flop**, and the **synchronous design discipline** that
-makes million-gate designs tractable. This is the pivotal module of the
-course; every module after it builds clocked logic.
+makes million-gate designs manageable. Every module after this one will build
+clocked logic.
 
 You'll build two designs straight out of a DAQ crate:
 
@@ -20,37 +20,42 @@ You'll build two designs straight out of a DAQ crate:
 
 Module 01's coincidence unit had a flaw a physicist spots instantly: it ANDs
 the *instantaneous* PMT signals. Real discriminated pulses are a few ns wide
-and never arrive on exactly the same clock cycle — cable lengths, PMT
-transit-time spread, and jitter guarantee that. A NIM coincidence module
+and never arrive on exactly the same clock cycle due to cable lengths, PMT
+transit-time spread, and jitter. A NIM coincidence module
 solves this with a **gate width knob**: each input pulse opens a gate of,
-say, 40 ns, and the coincidence is formed between the *gates*.
+say, 40 ns, and the coincidence is formed between the wider gates instead 
+of the input pulse.
 
 To open a 40 ns gate from a 10 ns pulse, the circuit must **remember** the
-pulse for three more cycles after it's gone. Combinational logic — any
-network of gates, however clever — cannot do that: its output is a pure
+pulse for three more cycles after it's gone. Any network of gates cannot do
+this as they use only combinatorial logic: its output is purely a 
 function of its *present* inputs. Memory requires a new component.
 
 ## Why clocks: the flip-flop
 
-The memory element of all synchronous logic is the **D flip-flop**: on the
-**rising edge** of the clock it samples its input, and it holds that value —
-ignoring all input changes — until the next rising edge. One flip-flop is
-one bit of state. A **register** is a row of them sharing a clock edge.
+The new component is the **D flip-flop**: it is the memory element of all
+synchronous logic.
 
-The clock is the experiment's metronome. At our nominal 100 MHz, every
-10 ns, every flip-flop in the design samples-and-holds *simultaneously*, and
-the whole design advances one step in lockstep. Between edges, the
-combinational logic between registers settles toward its next value; the
-edge freezes the result. Time in synchronous hardware is not continuous —
-it is an integer number of ticks. (An LHC experiment literally runs its
-whole trigger off the 40 MHz bunch-crossing clock: one tick, one collision.)
+The clock cycle is typically a square wave signal that switches between a high 
+state and a low state at a constant frequency. The rising edge of the clock is 
+then the moment that it switches from 0 (the low state) to 1 (the high state). 
+The D flip-flop samples the input on the rising edge of the clock, and it holds 
+that value until the next rising edge, ignoring any changes to the input within 
+that clock cycle. One flip-flop is one bit of state. A **register** is a row of 
+them sharing a clock edge. Time in synchronous hardware is not continuous but 
+an integer number of ticks. 
 
-**Software analogy — and where it breaks.** You might think of the clock as
-a `while True:` loop with the body running once per tick. The part that's
-right: state updates happen once per tick. The part that's wrong: there is
-no *body being executed* — every register in the chip updates in the same
-instant, in parallel, ten thousand "loop iterations" wide. There is no
-program counter to be somewhere else.
+The clock is the experiment's metronome. For an LHC experiment, each clock tick 
+corresponds to one collision, and hence the clock frequency is the bunch-crossing
+rate 40 MHz. At each clock cycle, every flip-flop in the design samples-and-holds 
+*simultaneously*, and the whole design advances by one step. Between edges,
+i.e. during the clock cycle, the combinatorial logic between registers settles 
+toward its next value; that value is captured by the following edge. 
+
+*Software analogy:* You might think of the clock as a `while True:` loop with the 
+body running once per tick. While it is correct that state updates happen once per 
+tick, each loop iteration is run in parallel and not sequentially. Every register
+in the chip updates in the same instant. 
 
 ## The clocked process template
 
@@ -73,12 +78,18 @@ end process name;
 
 Every piece is load-bearing:
 
-* **`process (clk)` — only `clk` in the sensitivity list.** The sensitivity
-  list says when the simulator re-evaluates the process. A flip-flop reacts
-  *only* to the clock; its data inputs (and `rst`) are merely *sampled* at
-  the edge, so they don't belong in the list. Listing them wouldn't change
-  the hardware but would misdescribe it — and in older VHDL styles it's a
-  classic source of simulation/synthesis mismatch.
+* **`process (clk)` — only `clk` in the sensitivity list.**
+  The sensitivity list is the list of signals enclosed in parentheses immediately
+  after the process keyword. This determines when a sequential process block
+  activates and executes during simulation. Whenever any signal inside the sensitivity
+  list experiences an event (a change in value from high-to-low or low-to-high),
+  the process wakes up, executes its statements from top to bottom,
+  and then goes back to sleep until the next signal change. 
+  
+  A flip-flop reacts *only* to the clock; its data inputs (and `rst`) are
+  merely *sampled* at the edge, and hence don't belong in the sensitivity list.
+  Listing them wouldn't change the hardware but would misdescribe it — this is
+  a classic source of simulation/synthesis mismatch in older VHDL styles.
 * **`rising_edge(clk)`** is a function from `std_logic_1164` that is true
   only at a `'0'`→`'1'` transition. Guarding everything with it says: these
   assignments happen at the edge *and at no other time*.
